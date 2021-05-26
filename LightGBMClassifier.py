@@ -1,9 +1,11 @@
 import pandas as pd
 import lightgbm
+import numpy as np
+import seaborn as sns
 from sklearn.preprocessing import OrdinalEncoder
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 
 # Loading Data
 data = pd.read_csv("TrainingData.csv")
@@ -64,3 +66,16 @@ f1_scr = f1_score(y_test, y_test_pred, average='weighted')
 
 print("Final Accracy Score:", acc_score)
 print("Final F1 Score", f1_scr)
+
+my_confusion_matrix = confusion_matrix(y_test, y_test_pred)
+
+group_labels = ["True Negative", "False Positive",
+                "False Negative", "True Positive"]
+gorup_label_count = ["{0:0.0f}".format(value) for value in
+                     my_confusion_matrix.flatten()]
+group_label_percentages = ["{0:.3%}".format(value) for value in
+                           my_confusion_matrix.flatten()/np.sum(my_confusion_matrix)]
+labels = [f"{a1}\n{a2}\n{a3}" for a1, a2, a3 in
+          zip(group_labels, gorup_label_count, group_label_percentages)]
+labels = np.asarray(labels).reshape(2, 2)
+sns.heatmap(my_confusion_matrix, annot=labels, fmt="", cmap='Blues')
